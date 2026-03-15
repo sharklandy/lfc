@@ -1,11 +1,5 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  output: 'export',
-  basePath: '/lfc',
-  images: {
-    unoptimized: true,
-  },
-};
+const nextConfig: NextConfig = {};
 
 export default nextConfig;

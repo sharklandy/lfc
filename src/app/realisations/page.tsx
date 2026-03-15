@@ -2,82 +2,30 @@ import type { Metadata } from 'next';
 import SectionTitle from '@/components/SectionTitle';
 import Link from 'next/link';
 import { ArrowRight, MapPin, Calendar, Tag } from 'lucide-react';
+import { createReader } from '@keystatic/core/reader';
+import keystaticConfig from '../../../keystatic.config';
 
 export const metadata: Metadata = {
   title: 'Nos réalisations',
   description: "Découvrez nos projets récents : aménagement de bureaux, rénovation d'appartements, isolation, faux plafonds. La preuve par l'image de notre savoir-faire.",
 };
 
-const projects = [
-  {
-    title: 'Bureaux Coworking Bastille',
-    category: 'Aménagement tertiaire',
-    location: 'Paris 11e',
-    year: '2025',
-    surface: '450 m²',
-    duration: '8 semaines',
-    description: "Aménagement complet d'un espace de coworking sur 450 m² : cloisons vitrées, salles de réunion acoustiques, open space et espaces détente. Un projet alliant design contemporain et performance acoustique.",
-    before: 'https://images.unsplash.com/photo-1572025442646-866d16c84a54?w=600&h=400&fit=crop',
-    after: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&h=400&fit=crop',
-  },
-  {
-    title: 'Clinique Saint-Louis',
-    category: 'Établissement de santé',
-    location: 'Paris 10e',
-    year: '2025',
-    surface: '1 200 m²',
-    duration: '14 semaines',
-    description: "Réaménagement de l'aile B de la clinique : cloisons coupe-feu, isolation acoustique renforcée, faux plafonds techniques intégrant éclairage LED et climatisation. Travaux réalisés en site occupé.",
-    before: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=600&h=400&fit=crop',
-    after: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&h=400&fit=crop',
-  },
-  {
-    title: 'Loft Montmartre',
-    category: 'Résidentiel haut de gamme',
-    location: 'Paris 18e',
-    year: '2024',
-    surface: '180 m²',
-    duration: '6 semaines',
-    description: "Transformation d'un ancien atelier en loft contemporain : création de cloisons mobiles, isolation thermique et acoustique, faux plafond avec spots intégrés et rangements sur mesure.",
-    before: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600&h=400&fit=crop',
-    after: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=400&fit=crop',
-  },
-  {
-    title: 'Siège Social TechVision',
-    category: 'Bureaux corporate',
-    location: 'La Défense (92)',
-    year: '2024',
-    surface: '2 500 m²',
-    duration: '20 semaines',
-    description: "Réaménagement complet du siège social sur 3 niveaux : création d'espaces collaboratifs, salles de visioconférence haute technologie, zones de concentration et cafétéria. Un projet ambitieux livré dans les délais.",
-    before: 'https://images.unsplash.com/photo-1497215842964-222b430dc094?w=600&h=400&fit=crop',
-    after: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=600&h=400&fit=crop',
-  },
-  {
-    title: 'Boutique Élégance',
-    category: 'Commerce',
-    location: 'Paris 8e',
-    year: '2024',
-    surface: '120 m²',
-    duration: '4 semaines',
-    description: "Aménagement intérieur d'une boutique de prêt-à-porter haut de gamme : cloisons décoratives, cabines d'essayage, faux plafond décoratif avec éclairage d'ambiance et rangements intégrés.",
-    before: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=600&h=400&fit=crop',
-    after: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=400&fit=crop',
-  },
-  {
-    title: 'Résidence Les Jardins',
-    category: 'Logement collectif',
-    location: 'Boulogne-Billancourt (92)',
-    year: '2023',
-    surface: '3 800 m²',
-    duration: '24 semaines',
-    description: "Pose de cloisons et doublages pour 45 logements neufs : cloisons de distribution, doublages isolants, gaines techniques et faux plafonds dans les parties communes. Un chantier d'envergure mené avec rigueur.",
-    before: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&h=400&fit=crop',
-    after: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&h=400&fit=crop',
-  },
-];
+const reader = createReader(process.cwd(), keystaticConfig);
 
-export default function RealisationsPage() {
+export default async function RealisationsPage() {
+  const entries = await reader.collections.realisations.all();
+  const projects = entries.map(({ slug, entry }) => ({
+    slug,
+    title: entry.title as string,
+    category: entry.category,
+    location: entry.location,
+    year: entry.year,
+    surface: entry.surface,
+    duration: entry.duration,
+    description: entry.description,
+    before: entry.beforeImage,
+    after: entry.afterImage,
+  }));
   return (
     <>
       {/* Hero */}
@@ -107,7 +55,7 @@ export default function RealisationsPage() {
 
           <div className="space-y-20">
             {projects.map((project, index) => (
-              <div key={project.title} className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+              <div key={project.slug} className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
                 <div className={`grid grid-cols-1 lg:grid-cols-2`}>
                   {/* Images */}
                   <div className={`${index % 2 !== 0 ? 'lg:order-2' : ''}`}>

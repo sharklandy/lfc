@@ -5,6 +5,8 @@ import {
   Layers, Building2, Wrench, Home,
   ArrowRight, CheckCircle2, Quote, PaintBucket
 } from 'lucide-react';
+import { createReader } from '@keystatic/core/reader';
+import keystaticConfig from '../../keystatic.config';
 
 const services = [
   {
@@ -39,60 +41,33 @@ const services = [
   },
 ];
 
-const stats = [
-  { value: '15+', label: "Années d'expérience" },
-  { value: '500+', label: 'Projets réalisés' },
-  { value: '98%', label: 'Clients satisfaits' },
-  { value: '50+', label: 'Collaborateurs' },
-];
+const reader = createReader(process.cwd(), keystaticConfig);
 
-const realisations = [
-  {
-    title: 'Bureaux Coworking Paris 11e',
-    category: 'Aménagement tertiaire',
-    year: '2025',
-    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&h=400&fit=crop',
-  },
-  {
-    title: 'Rénovation Clinique Saint-Louis',
-    category: 'Établissement de santé',
-    year: '2025',
-    image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&h=400&fit=crop',
-  },
-  {
-    title: 'Loft Contemporain Montmartre',
-    category: 'Résidentiel haut de gamme',
-    year: '2024',
-    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=400&fit=crop',
-  },
-];
+export default async function HomePage() {
+  const [settings, allRealisations, allTemoignages] = await Promise.all([
+    reader.singletons.parametres.read(),
+    reader.collections.realisations.all(),
+    reader.collections.temoignages.all(),
+  ]);
 
-const testimonials = [
-  {
-    name: 'Sophie Martinet',
-    role: 'Directrice, Clinique Saint-Louis',
-    content: "LFC Cloison a réalisé l'aménagement complet de notre nouvelle aile. Travail impeccable, respect des délais et grande réactivité. Une équipe professionnelle que nous recommandons vivement.",
-    rating: 5,
-  },
-  {
-    name: 'Jean-Pierre Dubois',
-    role: 'Gérant, JP Immobilier',
-    content: "Nous faisons appel à LFC Cloison depuis 5 ans pour nos projets de rénovation. Leur savoir-faire en matière de cloisons et d'isolation est remarquable. Un partenaire de confiance.",
-    rating: 5,
-  },
-  {
-    name: 'Marie Lefèvre',
-    role: "Architecte d'intérieur",
-    content: "J'ai collaboré avec LFC Cloison sur plusieurs projets résidentiels haut de gamme. Leur précision et leur souci du détail correspondent parfaitement aux exigences de mes clients.",
-    rating: 5,
-  },
-];
+  const stats = settings?.stats ?? [];
+  const partners = settings?.partners ?? [];
 
-const partners = [
-  'Placo®', 'Saint-Gobain', 'Knauf', 'Rockwool', 'Isover', 'Siniat',
-];
+  const realisations = allRealisations.slice(0, 3).map(({ slug, entry }) => ({
+    slug,
+    title: entry.title as string,
+    category: entry.category,
+    year: entry.year,
+    image: entry.afterImage,
+  }));
 
-export default function HomePage() {
+  const testimonials = allTemoignages.map(({ slug, entry }) => ({
+    slug,
+    name: entry.name as string,
+    role: entry.role,
+    content: entry.content,
+    rating: entry.rating ?? 5,
+  }));
   return (
     <>
       {/* Hero Section */}
@@ -287,7 +262,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {realisations.map((project) => (
               <div
-                key={project.title}
+                key={project.slug}
                 className="group relative rounded-xl overflow-hidden aspect-[4/3] cursor-pointer"
               >
                 <div
@@ -328,7 +303,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonials.map((testimonial) => (
               <div
-                key={testimonial.name}
+                key={testimonial.slug}
                 className="bg-white rounded-xl p-8 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow"
               >
                 <div className="flex gap-1 mb-4">

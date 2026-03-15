@@ -1,64 +1,27 @@
 import type { Metadata } from 'next';
 import SectionTitle from '@/components/SectionTitle';
 import { Mail, Phone, Linkedin } from 'lucide-react';
+import { createReader } from '@keystatic/core/reader';
+import keystaticConfig from '../../../keystatic.config';
 
 export const metadata: Metadata = {
   title: 'Notre équipe',
   description: "Rencontrez l'équipe LFC Cloison : des professionnels passionnés et expérimentés au service de vos projets d'aménagement intérieur.",
 };
 
-const team = [
-  {
-    name: 'Laurent Fontaine',
-    role: 'Fondateur & Gérant',
-    bio: "Fort de plus de 25 ans d'expérience dans le BTP, Laurent a fondé LFC Cloison en 2009 avec l'ambition de créer une entreprise alliant savoir-faire artisanal et exigences du marché professionnel. Il supervise personnellement les projets stratégiques et veille au respect des standards de qualité.",
-    email: 'l.fontaine@lfc-cloison.fr',
-    phone: '01 23 45 67 89',
-    image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=face',
-  },
-  {
-    name: 'Caroline Mercier',
-    role: 'Directrice Administrative et Financière',
-    bio: "Caroline gère l'ensemble des fonctions administratives et financières de l'entreprise depuis 2012. Son expertise en gestion d'entreprise du BTP permet à LFC Cloison de maintenir une croissance saine et maîtrisée tout en garantissant la satisfaction de nos partenaires financiers.",
-    email: 'c.mercier@lfc-cloison.fr',
-    phone: '01 23 45 67 90',
-    image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop&crop=face',
-  },
-  {
-    name: 'Sébastien Moreau',
-    role: 'Directeur Technique',
-    bio: "Ingénieur de formation, Sébastien apporte son expertise technique à tous nos projets depuis 2014. Il coordonne les études techniques, supervise les méthodes de mise en œuvre et forme nos équipes aux dernières innovations du secteur.",
-    email: 's.moreau@lfc-cloison.fr',
-    phone: '01 23 45 67 91',
-    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
-  },
-  {
-    name: 'Karim Benali',
-    role: 'Responsable de Chantier Senior',
-    bio: "Avec 18 ans d'expérience sur les chantiers, Karim est notre chef d'orchestre sur le terrain. Il gère les équipes, coordonne les interventions et s'assure que chaque chantier respecte les normes de qualité et de sécurité les plus strictes.",
-    email: 'k.benali@lfc-cloison.fr',
-    phone: '01 23 45 67 92',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
-  },
-  {
-    name: 'Marie Dupont',
-    role: 'Chargée d\'Affaires',
-    bio: "Marie est l'interlocutrice privilégiée de nos clients. Elle suit chaque projet de la prise de contact à la livraison, garantissant une communication fluide et transparente. Sa connaissance du marché et son sens du service font d'elle un atout précieux.",
-    email: 'm.dupont@lfc-cloison.fr',
-    phone: '01 23 45 67 93',
-    image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop&crop=face',
-  },
-  {
-    name: 'Thomas Legrand',
-    role: 'Responsable Études & Métrés',
-    bio: "Thomas réalise les études préalables de faisabilité, les métrés et les chiffrages. Son œil de spécialiste permet d'anticiper les contraintes techniques et d'optimiser les coûts pour proposer les meilleures solutions à nos clients.",
-    email: 't.legrand@lfc-cloison.fr',
-    phone: '01 23 45 67 94',
-    image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop&crop=face',
-  },
-];
+const reader = createReader(process.cwd(), keystaticConfig);
 
-export default function EquipePage() {
+export default async function EquipePage() {
+  const entries = await reader.collections.equipe.all();
+  const team = entries.map(({ slug, entry }) => ({
+    slug,
+    name: entry.name as string,
+    role: entry.role,
+    bio: entry.bio,
+    email: entry.email,
+    phone: entry.phone,
+    image: entry.image,
+  }));
   return (
     <>
       {/* Hero */}
@@ -88,7 +51,7 @@ export default function EquipePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {team.map((member) => (
-              <div key={member.name} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+              <div key={member.slug} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 group">
                 {/* Photo */}
                 <div className="relative overflow-hidden aspect-[4/3]">
                   <div
