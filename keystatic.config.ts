@@ -2,7 +2,7 @@ import { config, collection, singleton, fields } from '@keystatic/core';
 
 export default config({
   storage:
-    process.env.NODE_ENV === 'development' || !process.env.KEYSTATIC_GITHUB_CLIENT_ID
+    process.env.NODE_ENV === 'development' || !process.env.NEXT_PUBLIC_KEYSTATIC_GITHUB_CLIENT_ID
       ? { kind: 'local' }
       : {
           kind: 'github',
